@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package deusvm.v1;
+
+option go_package = "github.com/riccardotacconi/deusvm/pkg/proto;deusvmproto";
+
+message Empty {}
+
+message VM {
+  string id = 1;
+  string name = 2;
+  int32 cpu = 3;
+  int64 memory_bytes = 4;
+  int64 disk_bytes = 5;
+  string image = 6;
+  string status = 7; // running|stopped|unknown
+}
+
+message CreateVMRequest {
+  string name = 1;
+  string image = 2;
+  int32 cpu = 3;
+  int64 memory_bytes = 4;
+  int64 disk_bytes = 5;
+}
+
+message VMIDRequest {
+  string id = 1; // allow either id or name for convenience
+}
+
+message ListVMsResponse {
+  repeated VM vms = 1;
+}
+
+message Image {
+  string name = 1;
+  string path = 2;
+  int64 size_bytes = 3;
+  string format = 4; // qcow2|raw|unknown
+  string sha256 = 5;
+}
+
+message CreateImageRequest {
+  string name = 1;
+  string source = 2; // URL
+}
+
+message ImageNameRequest {
+  string name = 1;
+}
+
+message ListImagesResponse {
+  repeated Image images = 1;
+}
+
+service VMService {
+  rpc Create(CreateVMRequest) returns (VM);
+  rpc Delete(VMIDRequest) returns (Empty);
+  rpc Start(VMIDRequest) returns (Empty);
+  rpc Stop(VMIDRequest) returns (Empty);
+  rpc Get(VMIDRequest) returns (VM);
+  rpc List(Empty) returns (ListVMsResponse);
+}
+
+service ImageService {
+  rpc Create(CreateImageRequest) returns (Image);
+  rpc Delete(ImageNameRequest) returns (Empty);
+  rpc List(Empty) returns (ListImagesResponse);
+}
+
+

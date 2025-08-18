@@ -1,0 +1,17 @@
+[Unit]
+Description=DeusVM Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment=DEUSVM_API_LISTEN_ADDRESS=:8080
+ExecStart=/usr/local/bin/deusvm
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+
+
