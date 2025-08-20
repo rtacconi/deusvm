@@ -6,7 +6,7 @@ PROTO_DIR := pkg/proto
 PROTO_OUT := pkg/proto/gen
 PROTO_FILES := $(PROTO_DIR)/deusvm.proto
 
-.PHONY: help fmt tidy build clean proto proto-tools run docker-build
+.PHONY: help fmt tidy build clean proto proto-tools run docker-build deps
 
 help:
 	@echo "Targets:"
@@ -17,6 +17,7 @@ help:
 	@echo "  proto          - generate protobuf stubs into $(PROTO_OUT)"
 	@echo "  run            - run deusvm locally"
 	@echo "  docker-build   - build docker image deusvm:latest"
+	@echo "  deps           - install Debian/Ubuntu server dependencies (apt)"
 	@echo "  clean          - remove ./bin"
 
 fmt:
@@ -52,6 +53,14 @@ run: build
 
 docker-build:
 	docker build -t deusvm:latest .
+
+deps:
+	@which apt-get >/dev/null || (echo "apt-get not found. This target is for Debian/Ubuntu." && exit 1)
+	sudo apt-get update
+	sudo apt-get install -y \
+		qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils \
+		golang make git protobuf-compiler
+	@echo "Debian dependencies installed. Consider rebooting or relogging to ensure KVM modules are active."
 
 clean:
 	rm -rf $(BIN_DIR)
